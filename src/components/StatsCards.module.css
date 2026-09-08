@@ -1,0 +1,81 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  border-left: 3px solid transparent;
+}
+
+.card.accent { border-left-color: var(--accent); }
+.card.green  { border-left-color: var(--accent-green); }
+.card.yellow { border-left-color: var(--accent-yellow); }
+.card.red    { border-left-color: var(--accent-red); }
+.card.muted  { border-left-color: var(--border); }
+
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.eyeBtn {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.eyeBtn:hover {
+  opacity: 0.9;
+}
+
+.card.accent .value { color: var(--accent); }
+.card.green  .value { color: var(--accent-green); }
+.card.yellow .value { color: var(--accent-yellow); }
+.card.red    .value { color: var(--accent-red); }
+.card.muted  .value { color: var(--text); }
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.clickable:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--accent-red);
+}
+
+.hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
+}

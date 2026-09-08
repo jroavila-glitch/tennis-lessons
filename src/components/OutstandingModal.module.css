@@ -1,0 +1,168 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.header h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sub {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.close:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Person block ── */
+.personBlock {
+  border-bottom: 1px solid var(--border);
+}
+
+.personBlock:last-child {
+  border-bottom: none;
+}
+
+.personHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 8px;
+  background: var(--surface2);
+}
+
+.personName {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.personTotal {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-red);
+}
+
+/* ── Session row ── */
+.sessionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 24px 9px 36px;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.sessionRow:hover {
+  background: var(--surface2);
+}
+
+.sessionLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sessionDate {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sessionType {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pkg {
+  font-size: 11px;
+  background: rgba(79,142,247,0.15);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 600;
+}
+
+.sessionRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.due {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.paid {
+  font-size: 12px;
+  color: var(--accent-green);
+}
+
+.owes {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-red);
+  min-width: 48px;
+  text-align: right;
+}
+
+.empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+}

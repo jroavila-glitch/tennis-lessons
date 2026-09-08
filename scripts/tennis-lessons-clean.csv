@@ -1,0 +1,216 @@
+Date,Month,Type,Who,Paid (€),Court fee,Court (I covered),My profit,Method,Package session,Notes
+1,June,Clinic,"Nikhil, Brian",100,12,6,94,Paid,,Nikhil missing payment
+1,June,Clinic,"Rafa, Ari, Katerina, Nat",150,10,5,145,Paid,,
+2,June,Individual,Willem,50,9,4.5,45.5,Revolut,,I pay half court fee
+3,June,Individual,Brian,95.5,9,4.5,91,Cash,,I pay half court fee
+5,June,Individual,Pedro,95.5,9,4.5,91,Millenium,,I pay half court fee
+8,June,Clinic,"Brian, Alessandro, MacGill",150,12,6,144,Paid,,
+22,June,Clinic,"Nat, Katia, Cecilia, Ana Melo",150,10,5,145,Revolut,,"(Ceci, Katia) Millenium (Ana)"
+23,June,Individual,Willem,50,10,5,45,Paid,,
+26,June,Individual,Brian,95.5,9,4.5,91,Mb way,,114
+6,July,Clinic,"Nat, Sasha, Rafa, Juan",100,10,5,95,Revolut,,"Rafa, Sasha pending | Juan sponsored"
+6,July,Individual,Larissa,45,10,,45,Millenium,1,1/10 Paid a 10hr pack
+7,July,Individual,Willem,50,10,5,45,Revolut,,I pay half court fee
+8,July,Individual,Brian,95,10,5,90,Millenium,,
+11,July,Individual,Larissa,45,10,,45,Millenium,2,2/10 Paid a 10hr pack
+20,July,Individual,Larissa,90,10,,90,Millenium,4,4/10 pack
+20,July,Individual,Nikhil,85,15,5,80,Paid,1,1/10 of new pack (haven't paid)
+22,July,Individual,Brian,95,10,5,90,Paid,,
+26,July,Individual,Nikhil,45,15,5,40,Paid,2,2/10 of new pack (haven't paid)
+26,July,Individual,Larissa,90,10,,90,Millenium,6,6/10 pack
+27,July,Clinic,"Nat, Rafa",50,20,10,40,Revolut,,Rafa
+2,August,Individual,Larissa,90,10,,90,Millenium,8,8/10 pack
+2,August,Individual,Nikhil,45,15,5,40,Revolut,3,250 eur | 3/10 of new pack (haven't paid)
+3,August,Individual,Brian,75,5,,75,Millenium,,"pagó 110 como si hubieran sido dos horas, contando la cancha"
+8,August,Individual,Brian,75,5,,75,Millenium,,"pagó 110 como si hubieran sido dos horas, contando la cancha"
+18,August,Individual,Maxime,90,10,,90,Millenium,,
+21,August,Individual,Nikhil,85,15,5,80,Revolut,5,250 eur | 5/10 of new pack (haven't paid)
+23,August,Individual,Larissa,90,10,,90,Millenium,10,10/10 pack
+24,August,Clinic,"Nat, Rafa, Lena",100,12,6,94,Revolut,,"Rafa, Revolut Lena"
+27,August,Individual,Brian,95,10,5,90,Millenium,,
+29,August,Individual,Nikhil,65,15,5,60,Revolut,7,306 eur on Aug 23rd | 6.5/10 of new pack
+30,August,Individual,Larissa,90,10,,90,Millenium,2,2/10 pack - paid a new pack days ago
+1,September,Individual,Brian,95,10,5,90,Millenium,,
+2,September,Individual,James,90,10,,90,Millenium,,
+4,September,Individual,James,90,10,,90,Millenium,,
+8,September,Individual,James,90,10,,90,Millenium,,
+11,September,Individual,James,90,10,,90,Millenium,,
+12,September,Individual,Nikhil,65.25,13.5,4.5,60.75,Paid,8,8/10 of new pack
+12,September,Individual,Rita,60,10,,60,Millenium,,
+12,September,Individual,Nikhil,45,13.5,4.5,40.5,Paid,9,9/10 of 2nd pack
+16,September,Individual,Paulo,80,10,,80,Millenium,,
+16,September,Individual,Brian,95,10,5,90,Millenium,,
+21,September,Clinic,"Nat, Rafa",50,20,10,40,Revolut,,Rafa
+22,September,Individual,Brian,95,10,5,90,Millenium,,
+22,September,Individual,James,90,10,,90,Millenium,,
+23,September,Individual,Paulo,80,10,,80,Millenium,,
+24,September,Individual,Rita,60,10,,60,Millenium,,
+25,September,Individual,James,90,10,,90,Millenium,,
+25,September,Individual,Dick,90,10,,90,Millenium,,
+26,September,Individual,Larissa,90,10,,90,Millenium,4,4/10
+27,September,Individual,Brian,95,10,5,90,Millenium,,
+29,September,Individual,Brian,95,10,5,90,Millenium,,
+30,September,Individual,James,90,10,,90,Millenium,,
+1,October,Individual,Rita,60,10,,60,Millenium,,
+1,October,Individual,Paulo,80,10,,80,Millenium,,
+2,October,Individual,James,90,10,,90,Millenium,,
+7,October,Individual,James,90,10,,90,Millenium,,
+10,October,Individual,Dick,90,10,,90,Millenium,,
+10,October,Individual,Rita,60,10,,60,Millenium,,
+14,October,Individual,Brian,95,10,5,90,Millenium,,
+14,October,Individual,James,86,14,4,82,Millenium,,
+16,October,Individual,Gigi,60,10,,60,Millenium,,
+16,October,Individual,James,90,10,,90,Millenium,,
+16,October,Individual,Dick,90,10,,90,Millenium,,
+17,October,Individual,Larissa,90,10,,90,Millenium,6,6/10
+17,October,Individual,Brian,95,10,5,90,Millenium,,
+17,October,Individual,Nikhil,45,13.5,4.5,40.5,Paid,1,1/10 of 3rd pack
+20,October,Individual,Brian,95,10,5,90,Millenium,,
+23,October,Individual,Liz,90,10,,90,Millenium,,
+23,October,Individual,Dick,90,10,,90,Millenium,,
+27,October,Individual,Dick,90,10,,90,Millenium,,
+27,October,Individual,MacGill,60,10,,60,Paid,,
+27,October,Individual,Rita,60,10,,60,Millenium,,
+27,October,Individual,Thomas,80,10,,80,Revolut,,
+29,October,Individual,Rita,60,10,,60,Millenium,,
+30,October,Individual,Liz,90,10,,90,Millenium,,
+1,November,Individual,Brian,95,10,5,90,Millenium,,
+3,November,Individual,Brian,95,10,5,90,Millenium,,
+5,November,Group,"Brian, James",186,14,14,172,Millenium,,
+6,November,Individual,James,90,10,,90,Millenium,,
+6,November,Individual,Sasha R,100,10,,100,,,
+6,November,Individual,Dick,90,10,,90,Millenium,,
+7,November,Individual,Brian,95,10,5,90,Millenium,,
+8,November,Individual,Nikhil,45,13.5,4.5,40.5,Revolut,,
+8,November,Individual,MacGill,90,10,,90,Paid,,
+8,November,Individual,Sasha R,50,10,,50,,,
+10,November,Individual,James,90,10,,90,Millenium,,
+10,November,Individual,Rita,60,10,,60,Millenium,,
+10,November,Individual,Liz,90,10,,90,Millenium,,
+11,November,Individual,Sasha,50,14,4,46,Revolut,,
+18,November,Individual,Brian,95,10,5,90,Millenium,,
+19,November,Individual,Rita,60,10,,60,Millenium,,
+19,November,Individual,Jakob,82.5,10,,82.5,,,+1 hr de Junio. Debe 96 + 50 de Junio
+20,November,Individual,Liz,90,10,,90,Millenium,,
+21,November,Individual,Nikhil,50,13.5,4.5,45.5,Revolut,,
+21,November,Individual,Jakob,82.5,10,,82.5,,,+1 hr de Junio. Debe 192 + 50 de Junio
+22,November,Individual,Marie Lou,88.25,13.5,3.5,84.75,Revolut,,depositó 100 en vez de 103.50
+22,November,Individual,Larissa,90,10,,90,Millenium,8,8/10
+25,November,Individual,James,90,10,,90,Millenium,,
+25,November,Individual,Brian,95,10,5,90,Millenium,,
+26,November,Individual,Rebecca,89,12,2,87,Revolut,,depositó 100 en vez de 103.50
+27,November,Individual,Jakob,82.5,10,,82.5,,,+1 hr de Junio. Debe 288 + 50 de Junio
+28,November,Individual,Rebecca,89,12,2,87,Revolut,,depositó 100 en vez de 103.50
+28,November,Individual,Nikhil,50,13.5,4.5,45.5,Revolut,,
+29,November,Individual,Brian,95,10,5,90,Millenium,,
+1,December,Individual,Larissa,90,10,,90,Millenium,10,10/10
+1,December,Individual,Jakob,82.5,10,,82.5,,,+1 hr de Junio. Debe 384 + 50 de Junio
+2,December,Individual,James,85.75,18.5,8.5,77.25,Millenium,,
+3,December,Individual,Jakob,82.5,10,,82.5,,,+1 hr de Junio. Debe 480 + 50 de Junio | pagó por Revolut 550
+6,December,Individual,Brian,95,10,5,90,Millenium,,
+6,December,Individual,Marie Lou,88.25,13.5,3.5,84.75,Revolut,,
+10,December,Individual,Brian,95,10,5,90,Millenium,,
+10,December,Individual,Pierre,60,10,,60,Cash,,
+13,December,Individual,Rita,90,10,,90,Millenium,,
+17,December,Individual,Brian,95,10,5,90,Millenium,,
+17,December,Individual,Pierre,60,10,,60,Cash,,
+18,December,Individual,James,90,10,,90,Millenium,,
+22,December,Individual,Nikhil,50,13.5,4.5,45.5,Revolut,,
+26,December,Individual,Brian,95,10,5,90,Millenium,,
+29,December,Individual,Franziska,60,9,,60,Revolut,,
+30,December,Individual,Brian,140,15,5,135,Millenium,,
+31,December,Individual,Nikhil,50,13.5,4.5,45.5,Revolut,,
+5,January,Group,"Pierre, Yulia",100,10,,100,Cash,,
+6,January,Individual,Brian,105,10,5,100,Millenium,,
+19,January,Individual,Nikhil,50,13.5,4.5,45.5,Revolut,,
+14,February,Individual,Brian,105,10,5,100,Millenium,,
+16,February,Individual,Brian,105,10,5,100,Millenium,,
+17,February,Individual,Kiko,60,10,,60,Millenium,1,1/4 paid in December for 4 hrs
+17,February,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+20,February,Individual,Brian,105,10,5,100,Millenium,,
+22,February,Individual,Matt,60,10,,60,Revolut,,
+25,February,Individual,Alex,35,10,,35,Millenium,,
+26,February,Individual,Juan,,10,,,,,1a sesión (Pau)
+26,February,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+26,February,Individual,James,60,10,,60,Millenium,,
+27,February,Individual,Brian,105,10,5,100,Millenium,,
+28,February,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+3,March,Individual,Filip,65,5,5,60,Paid,,
+4,March,Individual,James,90,10,,90,Millenium,,
+4,March,Individual,Jo,60,10,10,50,Paid,,
+4,March,Group,"Alex, Delphine",100,10,10,90,Millenium,,
+5,March,Individual,Brian,105,10,5,100,Millenium,,
+6,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+6,March,Individual,James,60,10,,60,Millenium,,
+6,March,Individual,Juan,,10,,,,,2a sesión (Pau)
+11,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+11,March,Individual,Brian,105,10,5,100,Millenium,,
+11,March,Group,"Steve, Andy",100,10,10,90,Revolut,,/Millenium
+12,March,Individual,James,90,10,,90,Millenium,,
+12,March,Individual,Juan,,10,,,,,3a sesión (Pau)
+13,March,Individual,Filip,65,5,5,60,Paid,,
+13,March,Individual,Kiko,60,10,,60,Millenium,2,2de4
+13,March,Individual,Jo,60,10,10,50,Paid,,
+16,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+16,March,Individual,Kiko,60,10,,60,Millenium,3,3de4
+16,March,Individual,Fred,120,10,,120,Revolut,,
+17,March,Individual,Jo,60,10,10,50,,,owes 10eur from april 3rd he cancelled last minute
+17,March,Individual,Brian,105,10,5,100,Millenium,,
+17,March,Individual,James,90,10,,90,Millenium,,
+17,March,Individual,Gigi,60,10,,60,Revolut,1,10-pack
+18,March,Individual,Alex,60,10,,60,,,
+19,March,Individual,Brian,105,10,5,100,Paid,,
+20,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+23,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+23,March,Individual,James,90,10,,90,Millenium,,
+23,March,Individual,Kiko,60,10,,60,Millenium,4,"4de4, pagó otras 4 ya"
+24,March,Individual,Gigi,60,10,,60,Revolut,2,10-pack
+24,March,Individual,Juan,,10,,,,,4a sesión (Pau)
+25,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+25,March,Individual,Jason,60,10,,60,Millenium,,
+25,March,Individual,James,90,10,,90,Millenium,,
+26,March,Individual,Brian,105,10,5,100,Millenium,,
+27,March,Individual,Filip,65,5,5,60,Arq,,Dolarapp
+28,March,Group,"Steve, Andy",100,10,10,90,Revolut,,"/Millenium | Steve on Revolut, Andy on Millenium"
+30,March,Individual,Filip,65,5,5,60,,,
+30,March,Individual,Miguel,75,10,,75,Millenium,,10-pack  + 1 hr I owed
+31,March,Individual,Gigi,60,10,,60,Revolut,3,10-pack
+31,March,Individual,Miguel,75,10,,75,Paid,3,
+1,April,Individual,Brian,125,10,5,120,Millenium,,
+1,April,Individual,Myriam,60,10,,60,Millenium,,
+1,April,Individual,Jason,60,10,,60,Millenium,,
+1,April,Individual,Miguel,75,10,,75,Paid,5,
+2,April,Individual,Jesse,25,5,,25,,,owes 30
+2,April,Individual,Chelsea,90,10,,90,Millenium,1,Pack of 90 mins -  (60eur discount = 990 eur paid)
+2,April,Group,"Jason, Piero",100,10,10,90,Paid,,
+2,April,Individual,Juan,,10,,,,,5a sesión (Pau)
+3,April,Individual,Hania,90,10,,90,,,
+4,April,Individual,Aleja,60,10,,60,Millenium,,
+4,April,Individual,Juan,,10,,,,,juan debe cancha | 6a sesión (Pau)
+5,April,Individual,Marie Lou,90,10,,90,Revolut,,
+6,April,Individual,Chelsea,90,10,,90,Paid,2,Pack of 90 mins
+6,April,Individual,Brian,125,10,5,120,Millenium,,
+7,April,Individual,Brian,65,10,5,60,,,
+7,April,Individual,Miguel,100,10,,100,Paid,7,
+8,April,Individual,Gigi,60,10,,60,Revolut,4,10-pack
+8,April,Individual,Myriam,60,10,,60,Paid,,
+8,April,Individual,Miguel,75,10,,75,Paid,8,
+9,April,Individual,Chelsea,90,10,,90,Paid,3,Pack of 90 mins
+9,April,Individual,Jason,60,10,,60,Millenium,,
+9,April,Individual,Miguel,75,10,,75,Paid,10,
+10,April,Individual,Brian,125,10,5,120,,,
+10,April,Individual,Miguel,75,10,,75,Paid,11,
+11,April,Individual,Jesse,50,5,,50,,,"owes 60 | slice, short balls, drop shots, coberto 3"
+13,April,Individual,Myriam,60,10,,60,Paid,,
+13,April,Individual,Chelsea,90,10,,90,Paid,4,Pack of 90 mins
+13,April,Individual,Kiko,60,10,,60,Millenium,1,
+13,April,Individual,Miguel,75,10,,75,,,
+14,April,Individual,Gigi,60,10,,60,Revolut,5,10-pack
+14,April,Individual,James,90,10,,90,Millenium,,
+14,April,Individual,Miguel,75,10,,75,,,
+15,April,Individual,Hania,90,,,90,,,
+15,April,Individual,Filip,65,5,5,60,,,
+15,April,Individual,Miguel,75,10,,75,,,
+15,April,Individual,Francesco,60,10,,60,Revolut,,
+15,April,Individual,Jason,60,10,,60,Millenium,,
+16,April,Individual,Delphine,60,10,,60,,,
