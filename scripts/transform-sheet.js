@@ -63,7 +63,7 @@ function parseMethodField(raw, paidFull, oldPkgSession, oldComments) {
   // Helper: try to pull a package session number out of any string
   function extractPkgSession(str) {
     const m = str.match(/(\d+(?:\.\d+)?)\s*(?:\/|de)\s*\d+/i)
-    return m ? Math.round(parseFloat(m[1])) : null
+    return m ? parseFloat(m[1]) : null
   }
 
   // "---" or blank
@@ -77,7 +77,7 @@ function parseMethodField(raw, paidFull, oldPkgSession, oldComments) {
   // Package-progress patterns: "1/10 Revolut 10-pack", "4.5/11", "8 de 11", "11 de 11"
   const pkgMatch = raw.match(/^(\d+(?:\.\d+)?)\s*(?:\/|de)\s*\d+\s*(.*)$/i)
   if (pkgMatch) {
-    const sess = Math.round(parseFloat(pkgMatch[1]))
+    const sess = parseFloat(pkgMatch[1])
     const rest = (pkgMatch[2] || '').trim()
     const mMatch = rest.match(KNOWN_METHODS)
     const method = mMatch

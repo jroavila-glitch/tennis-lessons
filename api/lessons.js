@@ -83,7 +83,7 @@ function parseRows(rows) {
       who,
       people:            people.length,
       isPackage:         bool(r[4]),
-      packageSession:    pkgSession ? parseInt(pkgSession) : null,
+      packageSession:    pkgSession ? parseFloat(pkgSession) : null,
       packageSize:       pkgSize,
       pricePerHour:      num(r[7]),
       hours:             num(r[8]),
