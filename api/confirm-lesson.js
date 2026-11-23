@@ -8,13 +8,28 @@ export default async function handler(req, res) {
   const { id, confirmed } = req.body || {}
   if (!id || !confirmed) return res.status(400).json({ error: 'Missing id or confirmed' })
 
+  const body = JSON.stringify({ id, s: secret, confirmed })
+
   try {
-    const response = await fetch(scriptUrl, {
+    // Apps Script /exec redirects with 302; follow it manually to preserve POST body
+    let response = await fetch(scriptUrl, {
       method:   'POST',
-      redirect: 'follow',
+      redirect: 'manual',
       headers:  { 'Content-Type': 'application/json' },
-      body:     JSON.stringify({ id, s: secret, confirmed }),
+      body,
     })
+
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (location) {
+        response = await fetch(location, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        })
+      }
+    }
+
     const data = await response.json()
     res.setHeader('Cache-Control', 'no-store')
     res.status(200).json(data)
