@@ -4,11 +4,14 @@ import StatsCards from './components/StatsCards.jsx'
 import PackageTracker from './components/PackageTracker.jsx'
 import LessonsTable from './components/LessonsTable.jsx'
 import OutstandingModal from './components/OutstandingModal.jsx'
+import ConfirmLesson from './components/ConfirmLesson.jsx'
 import styles from './App.module.css'
 
 const TABS = ['Overview', 'Packages', 'All Lessons']
 
 export default function App() {
+  if (window.location.pathname === '/confirm') return <ConfirmLesson />
+
   const [lessons, setLessons] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
