@@ -2,27 +2,31 @@
 // TENNIS LESSONS — POST-LESSON AUTOMATION
 // ═══════════════════════════════════════════════════════════════════════
 //
-// SETUP (do this once):
+// SETUP (do this once, in order):
 //
 // 1. Open your Google Sheet → Extensions → Apps Script
 // 2. Paste this entire file, replacing any existing code
-// 3. Add Script Properties (Project Settings → Script Properties):
-//      SHEET_ID          → your spreadsheet ID (from the sheet URL)
-//      CALENDAR_ID       → your calendar ID (usually your Gmail address)
-//      WHATSAPP_NUMBER   → your number with country code, no + (e.g. 351912345678)
-//      CALLMEBOT_API_KEY → from Callmebot (send "I allow callmebot to send me messages"
-//                          to +34 644 59 97 72 on WhatsApp to get your API key)
-//      CONFIRM_BASE_URL  → https://tennis-lessons.vercel.app
-//      SERVER_SECRET     → any long random string (also add this to Vercel env vars
-//                          as APPS_SCRIPT_SECRET)
+// 3. Run setupProperties()  ← sets all credentials automatically
 // 4. Deploy as Web App: Deploy → New Deployment → Web App
-//      Execute as: Me
-//      Who has access: Anyone
-//    Copy the /exec URL — add it to Vercel env vars as APPS_SCRIPT_URL
-// 5. Run installTriggers() ONCE from the editor (select it, click Run)
+//      Execute as: Me  |  Who has access: Anyone
+//    Copy the /exec URL — add to Vercel env vars as APPS_SCRIPT_URL
+// 5. Run installTriggers()
 // 6. Test with testTodaysLessons() or testProcessMostRecentLesson()
 //
 // ═══════════════════════════════════════════════════════════════════════
+
+// ── One-time credential setup — run this first ───────────────────────────
+function setupProperties() {
+  PropertiesService.getScriptProperties().setProperties({
+    SHEET_ID:          '19TJJ02E19NeWVmmnHsMwL4FXvYtxdNf8w5qlY5oqEtg',
+    CALENDAR_ID:       'jroavila@gmail.com',
+    WHATSAPP_NUMBER:   '5217771922492',
+    CALLMEBOT_API_KEY: '6508295',
+    CONFIRM_BASE_URL:  'https://tennis-lessons.vercel.app',
+    SERVER_SECRET:     'tennis-2026-mHvQ8pX3nK7wR5tYqL',
+  })
+  console.log('✅ Properties set. Next: deploy as Web App, then run installTriggers()')
+}
 
 // ── Court mapping ────────────────────────────────────────────────────────
 const COURTS = {
