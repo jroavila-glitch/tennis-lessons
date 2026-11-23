@@ -2,8 +2,8 @@ export default async function handler(req, res) {
   const { id } = req.query
   if (!id) return res.status(400).json({ error: 'Missing id' })
 
-  const scriptUrl = process.env.APPS_SCRIPT_URL
-  const secret    = process.env.APPS_SCRIPT_SECRET
+  const scriptUrl = (process.env.APPS_SCRIPT_URL    || '').trim()
+  const secret    = (process.env.APPS_SCRIPT_SECRET || '').trim()
   if (!scriptUrl) return res.status(500).json({ error: 'APPS_SCRIPT_URL not configured' })
 
   try {

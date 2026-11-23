@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const scriptUrl = process.env.APPS_SCRIPT_URL
-  const secret    = process.env.APPS_SCRIPT_SECRET
+  const scriptUrl = (process.env.APPS_SCRIPT_URL    || '').trim()
+  const secret    = (process.env.APPS_SCRIPT_SECRET || '').trim()
   if (!scriptUrl) return res.status(500).json({ error: 'APPS_SCRIPT_URL not configured' })
 
   const { id, confirmed } = req.body || {}
