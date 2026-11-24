@@ -30,6 +30,7 @@ export default function ConfirmLesson() {
   const [pkgSession, setPkgSession]     = useState(0)
   const [pkgSize, setPkgSize]           = useState(10)
   const [lastSession, setLastSession]   = useState(0)
+  const [packPrice, setPackPrice]       = useState(0)
   const [pricePerHr, setPricePerHr]     = useState(0)
 
   const params = new URLSearchParams(window.location.search)
@@ -63,6 +64,10 @@ export default function ConfirmLesson() {
         setPayment('pack')
         setPkgSession(p0.nextSession  || 0)
         setLastSession(p0.lastSession || 0)
+        // Default pack price = (size - 1) × rate (1 free session)
+        const size = p0.packageSize || 10
+        const rate = p0.lastPrice   || 0
+        setPackPrice((size - 1) * rate)
       }
 
       setLessonType(definite.length > 1 ? 'Group' : 'Individual')
@@ -76,9 +81,8 @@ export default function ConfirmLesson() {
   const confirmed          = attendees.filter(a => a.confirmed)
   const hours              = durationMin / 60
   const isFirstPackSession = isPackage && lastSession === 0
-  const packTotalDue       = pkgSize * pricePerHr
   const totalDue           = isPackage
-    ? (isFirstPackSession ? packTotalDue : 0)
+    ? (isFirstPackSession ? packPrice : 0)
     : Math.round(pricePerHr * hours * confirmed.length * 100) / 100
   const courtFeeRate = courtInfo
     ? (courtInfo.type === 'covered' ? (lightsOn ? 18 : 14) : (courtInfo.price || 0))
@@ -101,6 +105,7 @@ export default function ConfirmLesson() {
       isPackage,
       isFirstPackSession,
       lastSession,
+      packPrice:        isPackage && isFirstPackSession ? packPrice : null,
       packageSession:   isPackage ? pkgSession : null,
       packageSize:      isPackage ? pkgSize    : null,
       method:           (payment === 'paid' || payment === 'pack') ? method : '',
@@ -303,6 +308,20 @@ export default function ConfirmLesson() {
               <span className={styles.pkgSessionDisplay}>{pkgSize}</span>
             </div>
           )}
+
+          {isPackage && isFirstPackSession && (
+            <div className={`${styles.row} ${styles.mt8}`}>
+              <span className={styles.unit}>Pack price €</span>
+              <input
+                type="number"
+                className={styles.numInput}
+                value={packPrice}
+                onChange={e => setPackPrice(Math.max(0, Number(e.target.value)))}
+                min={0}
+                step={10}
+              />
+            </div>
+          )}
         </section>
 
         {/* ── Payment ───────────────────────────────────────────────────── */}
@@ -364,7 +383,7 @@ export default function ConfirmLesson() {
           <span className={styles.totalAmt}>€{totalDue}</span>
           <span className={styles.muted}>
             {isFirstPackSession
-              ? `${pkgSize} sessions · €${pricePerHr}/session`
+              ? `${pkgSize} sessions (1 free) · €${packPrice}`
               : isPackage
                 ? 'pre-paid'
                 : `${confirmed.length}× · ${formatDuration(durationMin)} · €${pricePerHr}/hr`}

@@ -463,9 +463,9 @@ function writeSingleRow(sheet, c) {
   const isFirstPackSession = !!c.isFirstPackSession  // session 1 of a new pack
   const paidInFull        = c.payment === 'paid' || c.payment === 'pack'
 
-  // K: session 1 = full pack price; session 2+ = 0; regular = per-session price
+  // K: session 1 = pack price (user-set, not packageSize × rate); session 2+ = 0; regular = per-session
   const totalDue = isFirstPackSession
-    ? (c.packageSize || 1) * c.pricePerHour
+    ? (c.packPrice != null ? c.packPrice : (c.packageSize - 1) * c.pricePerHour)
     : isPackage
       ? 0
       : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
