@@ -112,10 +112,10 @@ function getStudentPrice(sheet, studentName) {
 // ── Package lookup ────────────────────────────────────────────────────────
 function getPackageInfo(sheet, studentName) {
   const data = sheet.getDataRange().getValues()
-  let lastSession = 0
-  let packageSize = 10
   const nameLower = studentName.toLowerCase().trim()
 
+  // Collect all pack rows for this student in sheet order
+  const packRows = []
   for (let i = 1; i < data.length; i++) {
     const whoCell = (data[i][3] || '').toString().trim()
     if (!whoCell) continue
@@ -123,15 +123,37 @@ function getPackageInfo(sheet, studentName) {
     if (!names.includes(nameLower)) continue
     const isPkg = (data[i][4] || '').toString().trim().toUpperCase() === 'Y'
     if (!isPkg) continue
-    const sess = parseFloat(data[i][5]) || 0
-    const size = parseFloat(data[i][6]) || 10
-    if (sess > lastSession) { lastSession = sess; packageSize = size }
+    const f = parseFloat(data[i][5]) || 0
+    const g = parseFloat(data[i][6]) || 10
+    if (f > 0) packRows.push({ f, g })
   }
 
+  if (!packRows.length) return { hasActivePackage: false, lastSession: 0, nextSession: 0, packageSize: 10 }
+
+  // Find where the current pack starts: scan backwards for the last completed pack (f >= g)
+  let currentPackStart = 0
+  for (let i = packRows.length - 1; i >= 0; i--) {
+    if (packRows[i].f >= packRows[i].g) {
+      currentPackStart = i + 1
+      break
+    }
+  }
+
+  const currentRows = packRows.slice(currentPackStart)
+  const packageSize = currentRows.length
+    ? currentRows[currentRows.length - 1].g
+    : packRows[packRows.length - 1].g
+
+  if (!currentRows.length) {
+    // No rows in current pack yet — pack just completed, next will be session 1
+    return { hasActivePackage: false, lastSession: 0, nextSession: 0, packageSize }
+  }
+
+  const lastSession = currentRows[currentRows.length - 1].f
   return {
     hasActivePackage: lastSession > 0 && lastSession < packageSize,
     lastSession,
-    nextSession: lastSession + 1,
+    nextSession: lastSession,  // overridden in processEvent with + lessonHours
     packageSize,
   }
 }
