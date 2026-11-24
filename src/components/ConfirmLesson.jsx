@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import styles from './ConfirmLesson.module.css'
 
 const LESSON_TYPES = ['Individual', 'Group', 'Clinic', 'Tennis Rush', 'Tennis Smash']
-const METHODS = ['', 'Revolut', 'Cash', 'MB Way', 'DolarApp', 'ARQ']
+const METHODS = ['', 'Millenium', 'Revolut', 'Cash', 'ARQ']
 const MONTHS = ['January','February','March','April','May','June','July',
                 'August','September','October','November','December']
 
@@ -29,6 +29,7 @@ export default function ConfirmLesson() {
   const [isPackage, setIsPackage]       = useState(false)
   const [pkgSession, setPkgSession]     = useState(1)
   const [pkgSize, setPkgSize]           = useState(10)
+  const [pricePerHr, setPricePerHr]     = useState(0)
 
   const params = new URLSearchParams(window.location.search)
 
@@ -58,6 +59,10 @@ export default function ConfirmLesson() {
         setPkgSize(definite[0].packageSize)
       }
 
+      if (definite.length > 0 && definite[0].lastPrice > 0) {
+        setPricePerHr(definite[0].lastPrice)
+      }
+
       setLessonType(definite.length > 1 ? 'Group' : 'Individual')
       setStatus('ready')
     } catch (e) {
@@ -66,12 +71,13 @@ export default function ConfirmLesson() {
     }
   }, [])
 
-  const confirmed = attendees.filter(a => a.confirmed)
-  const pricePerHour = courtInfo
+  const confirmed    = attendees.filter(a => a.confirmed)
+  const hours        = durationMin / 60
+  const totalDue     = Math.round(pricePerHr * hours * confirmed.length * 100) / 100
+  const courtFeeRate = courtInfo
     ? (courtInfo.type === 'covered' ? (lightsOn ? 18 : 14) : (courtInfo.price || 0))
     : 0
-  const hours    = durationMin / 60
-  const totalDue = Math.round(pricePerHour * hours * confirmed.length * 100) / 100
+  const courtFeeYou  = Math.round(courtFeeRate * hours * 100) / 100
 
   async function handleSubmit() {
     if (confirmed.length === 0) return
@@ -81,7 +87,7 @@ export default function ConfirmLesson() {
       date:         lesson.date,
       people:       confirmed.map(a => a.name),
       durationMin,
-      pricePerHour,
+      pricePerHour: pricePerHr,
       courtType:    courtInfo?.type,
       courtNum:     courtInfo?.courtNum,
       type:         lessonType,
@@ -92,7 +98,7 @@ export default function ConfirmLesson() {
       method:       payment === 'paid' ? method : '',
       comments:     '',
       courtFeeStudent: 0,
-      courtFeeYou:     0,
+      courtFeeYou,
     }
 
     try {
@@ -199,6 +205,23 @@ export default function ConfirmLesson() {
             />
             <span className={styles.unit}>min</span>
             <span className={styles.muted}>{formatDuration(durationMin)}</span>
+          </div>
+        </section>
+
+        {/* ── Price per hour ────────────────────────────────────────────── */}
+        <section className={styles.section}>
+          <div className={styles.label}>Price per hour</div>
+          <div className={styles.row}>
+            <span className={styles.unit}>€</span>
+            <input
+              type="number"
+              className={styles.numInput}
+              value={pricePerHr}
+              onChange={e => setPricePerHr(Math.max(0, Number(e.target.value)))}
+              min={0}
+              step={5}
+            />
+            <span className={styles.unit}>/hr</span>
           </div>
         </section>
 
@@ -324,9 +347,15 @@ export default function ConfirmLesson() {
           <span>Total</span>
           <span className={styles.totalAmt}>€{totalDue}</span>
           <span className={styles.muted}>
-            {confirmed.length}× · {formatDuration(durationMin)} · €{pricePerHour}/hr
+            {confirmed.length}× · {formatDuration(durationMin)} · €{pricePerHr}/hr
           </span>
         </div>
+        {courtFeeYou > 0 && (
+          <div className={styles.courtFeeRow}>
+            <span className={styles.muted}>Court fee (you pay)</span>
+            <span className={styles.muted}>€{courtFeeYou}</span>
+          </div>
+        )}
 
         {/* ── Submit ────────────────────────────────────────────────────── */}
         <button
