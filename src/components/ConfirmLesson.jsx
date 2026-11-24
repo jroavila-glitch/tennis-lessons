@@ -54,16 +54,16 @@ export default function ConfirmLesson() {
       }
 
       const p0 = definite[0]
-      // Always read packageSize from student data so it's correct even before auto-detect
-      if (definite.length > 0 && p0 && p0.packageSize) {
-        setPkgSize(p0.packageSize)
+      // Always read pack info from student data — session/size are always computed server-side
+      if (definite.length > 0 && p0) {
+        if (p0.packageSize)              setPkgSize(p0.packageSize)
+        if (p0.nextSession)              setPkgSession(p0.nextSession)
+        if (p0.lastSession !== undefined) setLastSession(p0.lastSession)
       }
 
       if (definite.length > 0 && p0 && p0.hasActivePackage) {
         setIsPackage(true)
         setPayment('pack')
-        setPkgSession(p0.nextSession  || 0)
-        setLastSession(p0.lastSession || 0)
         // Default pack price = (size - 1) × rate (1 free session)
         const size = p0.packageSize || 10
         const rate = p0.lastPrice   || 0
