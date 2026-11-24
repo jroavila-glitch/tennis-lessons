@@ -5,10 +5,10 @@ export default async function handler(req, res) {
   const secret    = (process.env.APPS_SCRIPT_SECRET || '').trim()
   if (!scriptUrl) return res.status(500).json({ error: 'APPS_SCRIPT_URL not configured' })
 
-  const { id, confirmed } = req.body || {}
-  if (!id || !confirmed) return res.status(400).json({ error: 'Missing id or confirmed' })
+  const { confirmed } = req.body || {}
+  if (!confirmed) return res.status(400).json({ error: 'Missing confirmed data' })
 
-  const body = JSON.stringify({ id, s: secret, confirmed })
+  const body = JSON.stringify({ s: secret, confirmed })
 
   try {
     // Apps Script /exec redirects with 302; follow it manually to preserve POST body

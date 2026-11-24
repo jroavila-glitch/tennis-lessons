@@ -208,14 +208,15 @@ function processEvent(eventId) {
     ...getPackageInfo(sheet, p.name),
   }))
 
-  const id          = Utilities.getUuid()
-  const lessonData  = { ...parsed, people: peopleInfo, knownStudents }
-  storePendingLesson(id, lessonData)
+  // Encode lesson data directly in the URL — no PropertiesService needed for GET
+  const urlData  = { ...parsed, people: peopleInfo }
+  const encoded  = encodeURIComponent(Utilities.base64Encode(JSON.stringify(urlData)))
+  const confirmUrl = `${baseUrl}/confirm?d=${encoded}`
 
   // Build a readable WhatsApp message
-  const confirmed = peopleInfo.filter(p => !p.isMaybe)
+  const confirmedPeople = peopleInfo.filter(p => !p.isMaybe)
   const maybes    = peopleInfo.filter(p => p.isMaybe)
-  const nameStr   = confirmed.map(p => p.name).join(', ')
+  const nameStr   = confirmedPeople.map(p => p.name).join(', ')
     + (maybes.length ? ` *(+ maybe: ${maybes.map(p => p.name).join(', ')})*` : '')
 
   const hrs = parsed.durationMin / 60
@@ -226,11 +227,12 @@ function processEvent(eventId) {
     `👤 ${nameStr}`,
     `📍 ${parsed.title.replace('🎾 ', '')}  ·  ${hrsStr}  ·  €${parsed.courtInfo.price}/hr`,
     '',
-    `✅ ${baseUrl}/confirm?id=${id}`,
+    `✅ ${confirmUrl}`,
   ].join('\n')
 
   sendWhatsApp(msg)
   console.log('WhatsApp sent for:', parsed.title)
+  console.log('Confirm URL length:', confirmUrl.length)
 }
 
 // ── Trigger handler (called 5 min after lesson ends) ──────────────────────
@@ -343,17 +345,14 @@ function doPost(e) {
   try { body = JSON.parse(e.postData.contents) }
   catch (_) { return respond({ error: 'Invalid JSON' }) }
 
-  const { id, s: secret, confirmed } = body
+  const { s: secret, confirmed } = body
   const expectedSecret = PropertiesService.getScriptProperties().getProperty('SERVER_SECRET')
 
-  if (!id || secret !== expectedSecret) return respond({ error: 'Unauthorized' })
-
-  const lesson = getPendingLesson(id)
-  if (!lesson) return respond({ error: 'Not found or expired' })
+  if (secret !== expectedSecret) return respond({ error: 'Unauthorized' })
+  if (!confirmed)                return respond({ error: 'Missing confirmed data' })
 
   try {
     writeToSheet(confirmed)
-    deletePendingLesson(id)
     return respond({ success: true })
   } catch (err) {
     console.error('Write error:', err)
@@ -448,4 +447,22 @@ function testProcessMostRecentLesson() {
   if (!events.length) { console.log('No tennis events in last 7 days'); return }
   console.log('Processing:', events[0].getTitle())
   processEvent(events[0].getId())
+}
+
+// ── Debug: verify storage works ───────────────────────────────────────────
+function testStorage() {
+  const id = 'debug-test-' + Date.now()
+  storePendingLesson(id, { test: true, name: 'debug' })
+  const result = getPendingLesson(id)
+  if (result && result.test) {
+    console.log('✅ Storage works. Test ID:', id)
+    deletePendingLesson(id)
+  } else {
+    console.log('❌ Storage FAILED — getPendingLesson returned:', JSON.stringify(result))
+  }
+
+  // Also log all lesson_* properties currently stored
+  const all = PropertiesService.getScriptProperties().getProperties()
+  const lessons = Object.keys(all).filter(k => k.startsWith('lesson_'))
+  console.log('Pending lessons in storage:', lessons.length, '→', lessons.join(', '))
 }

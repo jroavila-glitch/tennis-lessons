@@ -30,45 +30,41 @@ export default function ConfirmLesson() {
   const [pkgSession, setPkgSession]     = useState(1)
   const [pkgSize, setPkgSize]           = useState(10)
 
-  const id = new URLSearchParams(window.location.search).get('id')
+  const params = new URLSearchParams(window.location.search)
 
   useEffect(() => {
-    if (!id) { setErrMsg('No lesson ID in URL'); setStatus('error'); return }
+    const encoded = params.get('d')
+    if (!encoded) { setErrMsg('No lesson data in URL'); setStatus('error'); return }
 
-    fetch(`/api/lesson-data?id=${encodeURIComponent(id)}`)
-      .then(r => r.text().then(text => {
-        try { return JSON.parse(text) }
-        catch (_) { throw new Error(`HTTP ${r.status}: ${text.slice(0, 200)}`) }
-      }))
-      .then(data => {
-        if (data.error) throw new Error(data.error)
-        setLesson(data)
+    try {
+      const data = JSON.parse(atob(encoded))
+      setLesson(data)
 
-        const people = data.people || []
-        setAttendees(people.map(p => ({ ...p, confirmed: !p.isMaybe })))
-        setDurationMin(data.durationMin || 60)
-        setCourtInfo(data.courtInfo || null)
+      const people = data.people || []
+      setAttendees(people.map(p => ({ ...p, confirmed: !p.isMaybe })))
+      setDurationMin(data.durationMin || 60)
+      setCourtInfo(data.courtInfo || null)
 
-        // Auto-detect pack for single student
-        const definite = people.filter(p => !p.isMaybe)
-        if (definite.length === 1 && definite[0].hasActivePackage) {
-          setIsPackage(true)
-          setPayment('pack')
-          setPkgSession(definite[0].nextSession)
-          setPkgSize(definite[0].packageSize)
-        } else if (definite.every(p => p.hasActivePackage) && definite.length > 1) {
-          setIsPackage(true)
-          setPayment('pack')
-          // For group: use first person's session
-          setPkgSession(definite[0].nextSession)
-          setPkgSize(definite[0].packageSize)
-        }
+      const definite = people.filter(p => !p.isMaybe)
+      if (definite.length === 1 && definite[0].hasActivePackage) {
+        setIsPackage(true)
+        setPayment('pack')
+        setPkgSession(definite[0].nextSession)
+        setPkgSize(definite[0].packageSize)
+      } else if (definite.every(p => p.hasActivePackage) && definite.length > 1) {
+        setIsPackage(true)
+        setPayment('pack')
+        setPkgSession(definite[0].nextSession)
+        setPkgSize(definite[0].packageSize)
+      }
 
-        setLessonType(definite.length > 1 ? 'Group' : 'Individual')
-        setStatus('ready')
-      })
-      .catch(e => { setErrMsg(e.message); setStatus('error') })
-  }, [id])
+      setLessonType(definite.length > 1 ? 'Group' : 'Individual')
+      setStatus('ready')
+    } catch (e) {
+      setErrMsg('Could not decode lesson data: ' + e.message)
+      setStatus('error')
+    }
+  }, [])
 
   const confirmed = attendees.filter(a => a.confirmed)
   const pricePerHour = courtInfo
@@ -103,7 +99,7 @@ export default function ConfirmLesson() {
       const res = await fetch('/api/confirm-lesson', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ id, confirmed: payload }),
+        body:    JSON.stringify({ confirmed: payload }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
