@@ -36,7 +36,10 @@ export default function ConfirmLesson() {
     if (!id) { setErrMsg('No lesson ID in URL'); setStatus('error'); return }
 
     fetch(`/api/lesson-data?id=${encodeURIComponent(id)}`)
-      .then(r => r.json())
+      .then(r => r.text().then(text => {
+        try { return JSON.parse(text) }
+        catch (_) { throw new Error(`HTTP ${r.status}: ${text.slice(0, 200)}`) }
+      }))
       .then(data => {
         if (data.error) throw new Error(data.error)
         setLesson(data)
