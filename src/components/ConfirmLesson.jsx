@@ -219,16 +219,7 @@ export default function ConfirmLesson() {
         <section className={styles.section}>
           <div className={styles.label}>Price per hour</div>
           <div className={styles.row}>
-            <span className={styles.unit}>€</span>
-            <input
-              type="number"
-              className={styles.numInput}
-              value={pricePerHr}
-              onChange={e => setPricePerHr(Math.max(0, Number(e.target.value)))}
-              min={0}
-              step={5}
-            />
-            <span className={styles.unit}>/hr</span>
+            <span className={styles.pkgSessionDisplay}>€{pricePerHr}/hr</span>
           </div>
         </section>
 
@@ -309,15 +300,8 @@ export default function ConfirmLesson() {
 
           {isPackage && isFirstPackSession && (
             <div className={`${styles.row} ${styles.mt8}`}>
-              <span className={styles.unit}>Pack price €</span>
-              <input
-                type="number"
-                className={styles.numInput}
-                value={packPrice}
-                onChange={e => setPackPrice(Math.max(0, Number(e.target.value)))}
-                min={0}
-                step={10}
-              />
+              <span className={styles.unit}>Pack price</span>
+              <span className={styles.pkgSessionDisplay}>€{packPrice}</span>
             </div>
           )}
         </section>
