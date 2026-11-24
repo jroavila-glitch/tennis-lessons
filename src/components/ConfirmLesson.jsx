@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import styles from './ConfirmLesson.module.css'
 
-const LESSON_TYPES = ['Individual', 'Group', 'Clinic', 'Tennis Rush', 'Tennis Smash']
+const LESSON_TYPES = ['Individual', 'Group', 'Tennis Rush', 'Tennis Smash']
 const METHODS = ['', 'Millenium', 'Revolut', 'Cash', 'ARQ']
 const MONTHS = ['January','February','March','April','May','June','July',
                 'August','September','October','November','December']
@@ -56,18 +56,16 @@ export default function ConfirmLesson() {
       const p0 = definite[0]
       // Always read pack info from student data — session/size are always computed server-side
       if (definite.length > 0 && p0) {
-        if (p0.packageSize)              setPkgSize(p0.packageSize)
-        if (p0.nextSession)              setPkgSession(p0.nextSession)
-        if (p0.lastSession !== undefined) setLastSession(p0.lastSession)
+        if (p0.packageSize)               setPkgSize(p0.packageSize)
+        if (p0.nextSession)               setPkgSession(p0.nextSession)
+        if (p0.lastSession !== undefined)  setLastSession(p0.lastSession)
+        // Pack price = (size - 1) × rate (1 free session) — always pre-fill
+        if (p0.packageSize && p0.lastPrice) setPackPrice((p0.packageSize - 1) * p0.lastPrice)
       }
 
       if (definite.length > 0 && p0 && p0.hasActivePackage) {
         setIsPackage(true)
         setPayment('pack')
-        // Default pack price = (size - 1) × rate (1 free session)
-        const size = p0.packageSize || 10
-        const rate = p0.lastPrice   || 0
-        setPackPrice((size - 1) * rate)
       }
 
       setLessonType(definite.length > 1 ? 'Group' : 'Individual')
