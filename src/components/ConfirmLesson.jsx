@@ -53,11 +53,15 @@ export default function ConfirmLesson() {
       }
 
       const p0 = definite[0]
-      if (definite.length > 0 && p0.hasActivePackage) {
+      // Always read packageSize from student data so it's correct even before auto-detect
+      if (definite.length > 0 && p0 && p0.packageSize) {
+        setPkgSize(p0.packageSize)
+      }
+
+      if (definite.length > 0 && p0 && p0.hasActivePackage) {
         setIsPackage(true)
         setPayment('pack')
         setPkgSession(p0.nextSession  || 0)
-        setPkgSize(p0.packageSize     || 10)
         setLastSession(p0.lastSession || 0)
       }
 
