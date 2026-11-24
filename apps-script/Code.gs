@@ -92,6 +92,23 @@ function parseCalendarEvent(event) {
   }
 }
 
+const SHEET_NAME = 'Sheet1'
+
+// ── Student price lookup (column H = Price per person/hr) ─────────────────
+function getStudentPrice(sheet, studentName) {
+  const data = sheet.getDataRange().getValues()
+  const nameLower = studentName.toLowerCase().trim()
+  for (let i = data.length - 1; i >= 1; i--) {
+    const whoCell = (data[i][3] || '').toString().trim()
+    if (!whoCell) continue
+    const names = whoCell.split(',').map(n => n.trim().toLowerCase())
+    if (!names.includes(nameLower)) continue
+    const price = parseFloat(data[i][7])
+    if (price > 0) return price
+  }
+  return 0
+}
+
 // ── Package lookup ────────────────────────────────────────────────────────
 function getPackageInfo(sheet, studentName) {
   const data = sheet.getDataRange().getValues()
@@ -199,14 +216,21 @@ function processEvent(eventId) {
   const parsed = parseCalendarEvent(event)
   if (!parsed) { console.log('Not a tennis event: ' + event.getTitle()); return }
 
-  const sheet         = SpreadsheetApp.openById(sheetId).getActiveSheet()
+  const sheet         = SpreadsheetApp.openById(sheetId).getSheetByName(SHEET_NAME)
   const knownStudents = getKnownStudents(sheet)
 
-  const peopleInfo = parsed.people.map(p => ({
-    ...p,
-    name: matchStudent(p.name, knownStudents),
-    ...getPackageInfo(sheet, p.name),
-  }))
+  const peopleInfo = parsed.people.map(p => {
+    const matchedName = matchStudent(p.name, knownStudents)
+    const pkgInfo     = getPackageInfo(sheet, matchedName)
+    return {
+      ...p,
+      name: matchedName,
+      ...pkgInfo,
+      // F column is cumulative lesson hours, not a simple count (e.g. 2 + 1.5h = 3.5)
+      nextSession: Math.round((pkgInfo.lastSession + parsed.durationMin / 60) * 100) / 100,
+      lastPrice:   getStudentPrice(sheet, matchedName),
+    }
+  })
 
   // Encode lesson data directly in the URL — no PropertiesService needed for GET
   const urlData  = { ...parsed, people: peopleInfo }
@@ -363,7 +387,7 @@ function doPost(e) {
 // ── Write a confirmed lesson row ──────────────────────────────────────────
 function writeToSheet(c) {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID')
-  const sheet   = SpreadsheetApp.openById(sheetId).getActiveSheet()
+  const sheet   = SpreadsheetApp.openById(sheetId).getSheetByName(SHEET_NAME)
 
   const date  = new Date(c.date + 'T12:00:00')
   const MONTHS = ['January','February','March','April','May','June','July',
@@ -373,9 +397,10 @@ function writeToSheet(c) {
 
   const hours      = c.durationMin / 60
   const numPeople  = c.people.length
-  const totalDue   = Math.round(c.pricePerHour * hours * numPeople * 100) / 100
-  const paidInFull = c.payment === 'paid' || c.payment === 'pack'
   const isPackage  = c.payment === 'pack' || !!c.isPackage
+  const paidInFull = c.payment === 'paid' || c.payment === 'pack'
+  // Package sessions have no per-session charge (pre-paid as a bundle)
+  const totalDue   = isPackage ? 0 : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
   const amtTx      = (paidInFull && c.payment !== 'pack') ? totalDue : 0
   const owes       = paidInFull ? 0 : totalDue
   const ctStu      = c.courtFeeStudent || 0
@@ -388,7 +413,7 @@ function writeToSheet(c) {
     String(date.getDate()),                   // B: Date
     type,                                     // C: Type
     c.people.join(', '),                      // D: Who
-    isPackage ? 'Y' : 'N',                   // E: Package?
+    isPackage ? 'Y' : '',                     // E: empty if no package
     isPackage ? (c.packageSession || '') : '', // F: Session #
     isPackage ? (c.packageSize    || '') : '', // G: Pack size
     c.pricePerHour,                           // H: Price/hr
@@ -406,6 +431,30 @@ function writeToSheet(c) {
     c.comments || '',                         // T: Comments
     year,                                     // U: Year
   ])
+
+  const newRow  = sheet.getLastRow()
+  const numCols = sheet.getLastColumn()
+  if (newRow > 2 && numCols > 0) {
+    const prevRow = sheet.getRange(newRow - 1, 1, 1, numCols)
+    const curRow  = sheet.getRange(newRow,     1, 1, numCols)
+    // Copy dropdown validation rules (doesn't touch values or formulas)
+    prevRow.copyTo(curRow, SpreadsheetApp.CopyPasteType.PASTE_DATA_VALIDATION, false)
+    // Copy formulas for specific computed columns: L (12) and R (18)
+    // These reference other cells in the same row (not data-entry columns)
+    ;[12, 18].forEach(col => {
+      const prevCell = sheet.getRange(newRow - 1, col)
+      if (prevCell.getFormula()) {
+        prevCell.copyTo(sheet.getRange(newRow, col),
+                        SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false)
+      }
+    })
+    // Copy formulas for all columns beyond our data range (col 22+)
+    if (numCols > 21) {
+      sheet.getRange(newRow - 1, 22, 1, numCols - 21)
+           .copyTo(sheet.getRange(newRow, 22, 1, numCols - 21),
+                   SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false)
+    }
+  }
 }
 
 // ── One-time setup: install daily triggers ────────────────────────────────
