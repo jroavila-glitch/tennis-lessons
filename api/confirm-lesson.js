@@ -19,14 +19,12 @@ export default async function handler(req, res) {
       body,
     })
 
+    // Apps Script /exec runs doPost on the first request and stores the response
+    // at the redirect URL — retrieve it with GET, not another POST
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location')
       if (location) {
-        response = await fetch(location, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body,
-        })
+        response = await fetch(location, { method: 'GET' })
       }
     }
 
