@@ -247,16 +247,23 @@ function processEvent(eventId) {
   const sheet         = SpreadsheetApp.openById(sheetId).getSheetByName(SHEET_NAME)
   const knownStudents = getKnownStudents(sheet)
 
+  const lessonHours = parsed.durationMin / 60
   const peopleInfo = parsed.people.map(p => {
-    const matchedName = matchStudent(p.name, knownStudents)
-    const pkgInfo     = getPackageInfo(sheet, matchedName)
+    const matchedName  = matchStudent(p.name, knownStudents)
+    const pkgInfo      = getPackageInfo(sheet, matchedName)
+    // If the pack is already complete, reset so form treats next session as pack session 1
+    const packComplete = pkgInfo.lastSession >= pkgInfo.packageSize && pkgInfo.lastSession > 0
     return {
       ...p,
-      name: matchedName,
+      name:            matchedName,
       ...pkgInfo,
-      // F column is cumulative lesson hours, not a simple count (e.g. 2 + 1.5h = 3.5)
-      nextSession: Math.round((pkgInfo.lastSession + parsed.durationMin / 60) * 100) / 100,
-      lastPrice:   getStudentPrice(sheet, matchedName),
+      hasActivePackage: packComplete ? false : pkgInfo.hasActivePackage,
+      lastSession:      packComplete ? 0     : pkgInfo.lastSession,
+      // F column is cumulative lesson hours; reset to this lesson's hours when pack just completed
+      nextSession: packComplete
+        ? Math.round(lessonHours * 100) / 100
+        : Math.round((pkgInfo.lastSession + lessonHours) * 100) / 100,
+      lastPrice: getStudentPrice(sheet, matchedName),
     }
   })
 
@@ -416,6 +423,33 @@ function doPost(e) {
 function writeToSheet(c) {
   const sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID')
   const sheet   = SpreadsheetApp.openById(sheetId).getSheetByName(SHEET_NAME)
+
+  // Overflow split: if ongoing pack session would exceed pack limit, write two rows
+  if (c.isPackage && !c.isFirstPackSession && c.lastSession !== undefined && c.packageSize) {
+    const remaining   = c.packageSize - c.lastSession
+    const lessonHours = c.durationMin / 60
+    if (lessonHours > remaining && remaining > 0) {
+      const overflowH = Math.round((lessonHours - remaining) * 100) / 100
+      // Row 1: complete old pack (remaining hours, all court fee)
+      writeSingleRow(sheet, { ...c, durationMin: Math.round(remaining * 60), packageSession: c.packageSize })
+      // Row 2: start new pack (overflow hours, no extra court fee)
+      writeSingleRow(sheet, {
+        ...c,
+        durationMin:      Math.round(overflowH * 60),
+        packageSession:   overflowH,
+        isFirstPackSession: true,
+        lastSession:      0,
+        payment:          'packOwes',   // owes new pack price until confirmed paid
+        courtFeeYou:      0,
+      })
+      return
+    }
+  }
+
+  writeSingleRow(sheet, c)
+}
+
+function writeSingleRow(sheet, c) {
 
   const date  = new Date(c.date + 'T12:00:00')
   const MONTHS = ['January','February','March','April','May','June','July',

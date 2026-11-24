@@ -53,7 +53,7 @@ export default function ConfirmLesson() {
       }
 
       const p0 = definite[0]
-      if (definite.length > 0 && (p0.hasActivePackage || p0.lastSession > 0)) {
+      if (definite.length > 0 && p0.hasActivePackage) {
         setIsPackage(true)
         setPayment('pack')
         setPkgSession(p0.nextSession  || 0)
@@ -152,7 +152,7 @@ export default function ConfirmLesson() {
         <div className={styles.summary}>
           <div className={styles.summaryRow}><span>Who</span><strong>{confirmed.map(a => a.name).join(', ')}</strong></div>
           <div className={styles.summaryRow}><span>Duration</span><strong>{formatDuration(durationMin)}</strong></div>
-          <div className={styles.summaryRow}><span>Court</span><strong>{courtInfo?.label}{courtInfo?.type === 'covered' ? (lightsOn ? ' + lights' : '') : ''}</strong></div>
+          <div className={styles.summaryRow}><span>Court</span><strong>{courtInfo ? `${courtInfo.label}${courtInfo.courtNum ? ` · Campo ${courtInfo.courtNum}` : ''}${courtInfo.type === 'covered' && lightsOn ? ' + lights' : ''}` : '—'}</strong></div>
           <div className={styles.summaryRow}><span>Total</span><strong>€{totalDue}</strong></div>
           <div className={styles.summaryRow}><span>Payment</span><strong>{payment === 'pack' ? '📦 Package' : payment === 'paid' ? '✓ Paid' : 'Owes'}</strong></div>
         </div>
@@ -197,18 +197,15 @@ export default function ConfirmLesson() {
         {/* ── Duration ──────────────────────────────────────────────────── */}
         <section className={styles.section}>
           <div className={styles.label}>Duration</div>
-          <div className={styles.row}>
-            <input
-              type="number"
-              className={styles.numInput}
-              value={durationMin}
-              onChange={e => setDurationMin(Math.max(15, Number(e.target.value)))}
-              min={15}
-              step={15}
-            />
-            <span className={styles.unit}>min</span>
-            <span className={styles.muted}>{formatDuration(durationMin)}</span>
-          </div>
+          <select
+            className={styles.select}
+            value={durationMin}
+            onChange={e => setDurationMin(Number(e.target.value))}
+          >
+            <option value={60}>60 min · 1h</option>
+            <option value={90}>90 min · 1h 30m</option>
+            <option value={120}>120 min · 2h</option>
+          </select>
         </section>
 
         {/* ── Price per hour ────────────────────────────────────────────── */}
@@ -232,7 +229,9 @@ export default function ConfirmLesson() {
         {courtInfo && (
           <section className={styles.section}>
             <div className={styles.label}>Court</div>
-            <div className={styles.courtTitle}>{lesson.title.replace('🎾 ', '')}</div>
+            <div className={styles.courtTitle}>
+              {courtInfo.label}{courtInfo.courtNum ? ` · Campo ${courtInfo.courtNum}` : ''}
+            </div>
             {courtInfo.type === 'covered' && (
               <div className={styles.toggle}>
                 <button
@@ -297,13 +296,7 @@ export default function ConfirmLesson() {
               <label className={styles.smallLabel}>Session</label>
               <span className={styles.pkgSessionDisplay}>{pkgSession || '—'}</span>
               <label className={styles.smallLabel}>of</label>
-              <input
-                type="number"
-                className={styles.smallNum}
-                value={pkgSize}
-                onChange={e => setPkgSize(Number(e.target.value))}
-                min={1}
-              />
+              <span className={styles.pkgSessionDisplay}>{pkgSize}</span>
             </div>
           )}
         </section>
