@@ -210,6 +210,15 @@
   text-align: center;
 }
 
+.pkgSessionDisplay {
+  min-width: 40px;
+  padding: 6px 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+}
+
 /* ── Payment ── */
 .payBtns {
   display: flex;

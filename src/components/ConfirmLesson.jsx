@@ -24,11 +24,12 @@ export default function ConfirmLesson() {
   const [courtInfo, setCourtInfo]       = useState(null)
   const [lightsOn, setLightsOn]         = useState(false)
   const [lessonType, setLessonType]     = useState('Individual')
-  const [payment, setPayment]           = useState('paid') // 'paid'|'owes'|'pack'
+  const [payment, setPayment]           = useState('paid') // 'paid'|'owes'|'pack'|'packOwes'
   const [method, setMethod]             = useState('')
   const [isPackage, setIsPackage]       = useState(false)
-  const [pkgSession, setPkgSession]     = useState(1)
+  const [pkgSession, setPkgSession]     = useState(0)
   const [pkgSize, setPkgSize]           = useState(10)
+  const [lastSession, setLastSession]   = useState(0)
   const [pricePerHr, setPricePerHr]     = useState(0)
 
   const params = new URLSearchParams(window.location.search)
@@ -47,20 +48,17 @@ export default function ConfirmLesson() {
       setCourtInfo(data.courtInfo || null)
 
       const definite = people.filter(p => !p.isMaybe)
-      if (definite.length === 1 && definite[0].hasActivePackage) {
-        setIsPackage(true)
-        setPayment('pack')
-        setPkgSession(definite[0].nextSession)
-        setPkgSize(definite[0].packageSize)
-      } else if (definite.every(p => p.hasActivePackage) && definite.length > 1) {
-        setIsPackage(true)
-        setPayment('pack')
-        setPkgSession(definite[0].nextSession)
-        setPkgSize(definite[0].packageSize)
-      }
-
       if (definite.length > 0 && definite[0].lastPrice > 0) {
         setPricePerHr(definite[0].lastPrice)
+      }
+
+      const p0 = definite[0]
+      if (definite.length > 0 && (p0.hasActivePackage || p0.lastSession > 0)) {
+        setIsPackage(true)
+        setPayment('pack')
+        setPkgSession(p0.nextSession  || 0)
+        setPkgSize(p0.packageSize     || 10)
+        setLastSession(p0.lastSession || 0)
       }
 
       setLessonType(definite.length > 1 ? 'Group' : 'Individual')
@@ -71,9 +69,13 @@ export default function ConfirmLesson() {
     }
   }, [])
 
-  const confirmed    = attendees.filter(a => a.confirmed)
-  const hours        = durationMin / 60
-  const totalDue     = Math.round(pricePerHr * hours * confirmed.length * 100) / 100
+  const confirmed          = attendees.filter(a => a.confirmed)
+  const hours              = durationMin / 60
+  const isFirstPackSession = isPackage && lastSession === 0
+  const packTotalDue       = pkgSize * pricePerHr
+  const totalDue           = isPackage
+    ? (isFirstPackSession ? packTotalDue : 0)
+    : Math.round(pricePerHr * hours * confirmed.length * 100) / 100
   const courtFeeRate = courtInfo
     ? (courtInfo.type === 'covered' ? (lightsOn ? 18 : 14) : (courtInfo.price || 0))
     : 0
@@ -84,20 +86,21 @@ export default function ConfirmLesson() {
     setStatus('submitting')
 
     const payload = {
-      date:         lesson.date,
-      people:       confirmed.map(a => a.name),
+      date:             lesson.date,
+      people:           confirmed.map(a => a.name),
       durationMin,
-      pricePerHour: pricePerHr,
-      courtType:    courtInfo?.type,
-      courtNum:     courtInfo?.courtNum,
-      type:         lessonType,
+      pricePerHour:     pricePerHr,
+      courtType:        courtInfo?.type,
+      courtNum:         courtInfo?.courtNum,
+      type:             lessonType,
       payment,
       isPackage,
-      packageSession: isPackage ? pkgSession : null,
-      packageSize:    isPackage ? pkgSize    : null,
-      method:       payment === 'paid' ? method : '',
-      comments:     '',
-      courtFeeStudent: 0,
+      isFirstPackSession,
+      lastSession,
+      packageSession:   isPackage ? pkgSession : null,
+      packageSize:      isPackage ? pkgSize    : null,
+      method:           (payment === 'paid' || payment === 'pack') ? method : '',
+      comments:         '',
       courtFeeYou,
     }
 
@@ -261,7 +264,6 @@ export default function ConfirmLesson() {
         <section className={styles.section}>
           <div className={styles.label}>Package</div>
 
-          {/* Show each person's pack status (read-only reference) */}
           {confirmed.length > 0 && (
             <div className={styles.packInfo}>
               {confirmed.map(a => (
@@ -269,7 +271,7 @@ export default function ConfirmLesson() {
                   <span className={styles.packName}>{a.name}</span>
                   <span className={styles.muted}>
                     {a.hasActivePackage
-                      ? `session ${a.nextSession}/${a.packageSize}`
+                      ? `session ${a.nextSession} / ${a.packageSize}`
                       : 'no active pack'}
                   </span>
                 </div>
@@ -284,7 +286,7 @@ export default function ConfirmLesson() {
               onChange={e => {
                 setIsPackage(e.target.checked)
                 if (e.target.checked) setPayment('pack')
-                else if (payment === 'pack') setPayment('paid')
+                else if (payment === 'pack' || payment === 'packOwes') setPayment('paid')
               }}
             />
             Log as package lesson
@@ -293,13 +295,7 @@ export default function ConfirmLesson() {
           {isPackage && (
             <div className={styles.pkgFields}>
               <label className={styles.smallLabel}>Session</label>
-              <input
-                type="number"
-                className={styles.smallNum}
-                value={pkgSession}
-                onChange={e => setPkgSession(Number(e.target.value))}
-                min={1}
-              />
+              <span className={styles.pkgSessionDisplay}>{pkgSession || '—'}</span>
               <label className={styles.smallLabel}>of</label>
               <input
                 type="number"
@@ -315,7 +311,30 @@ export default function ConfirmLesson() {
         {/* ── Payment ───────────────────────────────────────────────────── */}
         <section className={styles.section}>
           <div className={styles.label}>Payment</div>
-          {isPackage ? (
+          {isPackage && isFirstPackSession ? (
+            // Session 1: collect whether the pack price was paid
+            <>
+              <div className={styles.payBtns}>
+                <button
+                  className={`${styles.payBtn} ${payment === 'pack' ? styles.payPaid : ''}`}
+                  onClick={() => setPayment('pack')}
+                >✓ Pack paid</button>
+                <button
+                  className={`${styles.payBtn} ${payment === 'packOwes' ? styles.payOwes : ''}`}
+                  onClick={() => setPayment('packOwes')}
+                >Owes pack</button>
+              </div>
+              {payment === 'pack' && (
+                <select
+                  className={`${styles.select} ${styles.mt8}`}
+                  value={method}
+                  onChange={e => setMethod(e.target.value)}
+                >
+                  {METHODS.map(m => <option key={m} value={m}>{m || '— select method —'}</option>)}
+                </select>
+              )}
+            </>
+          ) : isPackage ? (
             <div className={styles.packBadge}>📦 Pre-paid pack</div>
           ) : (
             <>
@@ -347,7 +366,11 @@ export default function ConfirmLesson() {
           <span>Total</span>
           <span className={styles.totalAmt}>€{totalDue}</span>
           <span className={styles.muted}>
-            {confirmed.length}× · {formatDuration(durationMin)} · €{pricePerHr}/hr
+            {isFirstPackSession
+              ? `${pkgSize} sessions · €${pricePerHr}/session`
+              : isPackage
+                ? 'pre-paid'
+                : `${confirmed.length}× · ${formatDuration(durationMin)} · €${pricePerHr}/hr`}
           </span>
         </div>
         {courtFeeYou > 0 && (

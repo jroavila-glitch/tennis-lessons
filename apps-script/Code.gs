@@ -136,6 +136,34 @@ function getPackageInfo(sheet, studentName) {
   }
 }
 
+// ── Pack paid status: M value of the first session of the current pack ───────
+function getPackFirstSessionPaid(sheet, studentName, packageSize) {
+  const data = sheet.getDataRange().getValues()
+  const nameLower = studentName.toLowerCase().trim()
+  const packRows = []
+
+  for (let i = 1; i < data.length; i++) {
+    const whoCell = (data[i][3] || '').toString().trim()
+    if (!whoCell) continue
+    const names = whoCell.split(',').map(n => n.trim().toLowerCase())
+    if (!names.includes(nameLower)) continue
+    const isPkg = (data[i][4] || '').toString().trim().toUpperCase() === 'Y'
+    if (!isPkg) continue
+    packRows.push({ f: parseFloat(data[i][5]) || 0, m: (data[i][12] || '').toString().trim() })
+  }
+
+  if (!packRows.length) return 'N'
+
+  // Find the first session of the current pack by locating the last "reset"
+  // A pack resets after a row where f >= packageSize (pack completed)
+  let firstIdx = 0
+  for (let i = packRows.length - 1; i > 0; i--) {
+    if (packRows[i - 1].f >= packageSize) { firstIdx = i; break }
+  }
+
+  return packRows[firstIdx].m || 'N'
+}
+
 // ── Known students (unique names already in column D) ─────────────────────
 function getKnownStudents(sheet) {
   const data = sheet.getDataRange().getValues()
@@ -395,18 +423,34 @@ function writeToSheet(c) {
   const month = MONTHS[date.getMonth()]
   const year  = date.getFullYear().toString()
 
-  const hours      = c.durationMin / 60
-  const numPeople  = c.people.length
-  const isPackage  = c.payment === 'pack' || !!c.isPackage
-  const paidInFull = c.payment === 'paid' || c.payment === 'pack'
-  // Package sessions have no per-session charge (pre-paid as a bundle)
-  const totalDue   = isPackage ? 0 : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
-  const amtTx      = (paidInFull && c.payment !== 'pack') ? totalDue : 0
-  const owes       = paidInFull ? 0 : totalDue
-  const ctStu      = c.courtFeeStudent || 0
-  const ctYou      = c.courtFeeYou     || 0
-  const profit     = amtTx + ctStu - ctYou
-  const type       = c.type || (numPeople > 1 ? 'Group' : 'Individual')
+  const hours             = c.durationMin / 60
+  const numPeople         = c.people.length
+  const isPackage         = c.payment === 'pack' || c.payment === 'packOwes' || !!c.isPackage
+  const isFirstPackSession = !!c.isFirstPackSession  // session 1 of a new pack
+  const paidInFull        = c.payment === 'paid' || c.payment === 'pack'
+
+  // K: session 1 = full pack price; session 2+ = 0; regular = per-session price
+  const totalDue = isFirstPackSession
+    ? (c.packageSize || 1) * c.pricePerHour
+    : isPackage
+      ? 0
+      : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
+
+  const amtTx  = paidInFull ? totalDue : 0
+  const owes   = paidInFull ? 0 : totalDue
+  const ctYou  = c.courtFeeYou || 0
+  const profit = amtTx - ctYou
+  const type   = c.type || (numPeople > 1 ? 'Group' : 'Individual')
+
+  // M: pack paid status (Y/N) — only for pack rows
+  let packPaid = ''
+  if (isPackage) {
+    if (isFirstPackSession) {
+      packPaid = paidInFull ? 'Y' : 'N'
+    } else {
+      packPaid = getPackFirstSessionPaid(sheet, c.people[0], c.packageSize || 10)
+    }
+  }
 
   sheet.appendRow([
     month,                                    // A: Month
@@ -419,12 +463,12 @@ function writeToSheet(c) {
     c.pricePerHour,                           // H: Price/hr
     hours,                                    // I: Hours
     numPeople,                                // J: # People
-    totalDue,                                 // K: Total due
-    owes,                                     // L: Owes
-    '',                                       // M: (blank)
+    totalDue,                                 // K: Total due (pack price on session 1, else 0 or per-session)
+    owes,                                     // L: Amount still owed
+    packPaid,                                 // M: Pack paid? Y/N (pack rows only)
     amtTx,                                    // N: Amount transferred
-    ctStu,                                    // O: Court fee (student)
-    ctYou,                                    // P: Court fee (you)
+    ctYou,                                    // O: Court fee (you pay)
+    '',                                       // P: (unused)
     paidInFull ? 'Y' : 'N',                  // Q: Paid in full?
     profit,                                   // R: Total profit
     c.method   || '',                         // S: Method
