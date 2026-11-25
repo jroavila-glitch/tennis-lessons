@@ -584,6 +584,24 @@ function testTodaysLessons() {
   })
 }
 
+function testProcessTodaysLessons() {
+  const calId = PropertiesService.getScriptProperties().getProperty('CALENDAR_ID')
+  const now   = new Date()
+  const start = new Date(now); start.setHours(0, 0, 0, 0)
+  const end   = new Date(now); end.setHours(23, 59, 59, 999)
+
+  const events = CalendarApp.getCalendarById(calId)
+    .getEvents(start, end)
+    .filter(e => e.getTitle().startsWith('🎾'))
+
+  if (!events.length) { console.log('No tennis events today'); return }
+  console.log('Processing', events.length, 'lesson(s) from today')
+  events.forEach(e => {
+    console.log('→', e.getTitle())
+    processEvent(e.getId())
+  })
+}
+
 function testProcessMostRecentLesson() {
   const calId  = PropertiesService.getScriptProperties().getProperty('CALENDAR_ID')
   const now    = new Date()
