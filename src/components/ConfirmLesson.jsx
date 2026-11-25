@@ -24,8 +24,10 @@ export default function ConfirmLesson() {
   const [courtInfo, setCourtInfo]       = useState(null)
   const [lightsOn, setLightsOn]         = useState(false)
   const [lessonType, setLessonType]     = useState('Individual')
-  const [payment, setPayment]           = useState('paid') // 'paid'|'owes'|'pack'|'packOwes'
+  const [payment, setPayment]           = useState('pack') // pack: 'pack'|'packOwes'
+  const [payments, setPayments]         = useState({})    // non-pack: { [name]: 'paid'|'owes' }
   const [method, setMethod]             = useState('')
+  const [customTotal, setCustomTotal]   = useState(null)  // null = use computed
   const [isPackage, setIsPackage]       = useState(false)
   const [pkgSession, setPkgSession]     = useState(0)
   const [pkgSize, setPkgSize]           = useState(10)
@@ -52,6 +54,11 @@ export default function ConfirmLesson() {
       setAttendees(people.map(p => ({ ...p, confirmed: !p.isMaybe })))
       setDurationMin(data.durationMin || 60)
       setCourtInfo(data.courtInfo || null)
+      setCustomTotal(null)
+      // Default everyone to paid
+      const initPay = {}
+      people.filter(p => !p.isMaybe).forEach(p => { initPay[p.name] = 'paid' })
+      setPayments(initPay)
 
       const definite = people.filter(p => !p.isMaybe)
       if (definite.length > 0 && definite[0].lastPrice > 0) {
@@ -96,9 +103,23 @@ export default function ConfirmLesson() {
   const confirmed          = attendees.filter(a => a.confirmed)
   const hours              = durationMin / 60
   const isFirstPackSession = isPackage && lastSession === 0
-  const totalDue           = isPackage
+
+  const computedTotal = isPackage
     ? (isFirstPackSession ? packPrice : 0)
     : Math.round(pricePerHr * hours * confirmed.length * 100) / 100
+  const totalDue = customTotal !== null ? customTotal : computedTotal
+
+  // Per-person payment (non-pack only)
+  const paidPeople  = confirmed.filter(a => payments[a.name] !== 'owes')
+  const owesPeople  = confirmed.filter(a => payments[a.name] === 'owes')
+  const anyPaid     = isPackage ? payment === 'pack'  : paidPeople.length > 0
+  const allPaid     = isPackage ? payment === 'pack'  : owesPeople.length === 0
+  const sharePerPerson = confirmed.length > 0 ? Math.round(totalDue / confirmed.length * 100) / 100 : 0
+  const amtTx = isPackage
+    ? (payment === 'pack' ? totalDue : 0)
+    : Math.round(sharePerPerson * paidPeople.length * 100) / 100
+  const amtOwes = Math.round((totalDue - amtTx) * 100) / 100
+
   const courtFeeRate = courtInfo
     ? (courtInfo.type === 'covered' ? (lightsOn ? 18 : 14) : (courtInfo.price || 0))
     : 0
@@ -116,14 +137,17 @@ export default function ConfirmLesson() {
       courtType:        courtInfo?.type,
       courtNum:         courtInfo?.courtNum,
       type:             lessonType,
-      payment,
+      payment:          isPackage ? payment : (allPaid ? 'paid' : owesPeople.length === confirmed.length ? 'owes' : 'partial'),
       isPackage,
       isFirstPackSession,
       lastSession,
       packPrice:        isPackage && isFirstPackSession ? packPrice : null,
       packageSession:   isPackage ? pkgSession : null,
       packageSize:      isPackage ? pkgSize    : null,
-      method:           (payment === 'paid' || payment === 'pack') ? method : '',
+      totalDue,
+      amtTx,
+      amtOwes,
+      method:           anyPaid ? method : '',
       comments:         '',
       courtFeeYou,
     }
@@ -353,17 +377,22 @@ export default function ConfirmLesson() {
             <div className={styles.packBadge}>📦 Pre-paid pack</div>
           ) : (
             <>
-              <div className={styles.payBtns}>
-                <button
-                  className={`${styles.payBtn} ${payment === 'paid' ? styles.payPaid : ''}`}
-                  onClick={() => setPayment('paid')}
-                >✓ Paid</button>
-                <button
-                  className={`${styles.payBtn} ${payment === 'owes' ? styles.payOwes : ''}`}
-                  onClick={() => setPayment('owes')}
-                >Owes</button>
-              </div>
-              {payment === 'paid' && (
+              {confirmed.map(a => (
+                <div key={a.name} className={styles.personPayRow}>
+                  <span className={styles.personName}>{a.name}</span>
+                  <div className={styles.payBtns}>
+                    <button
+                      className={`${styles.payBtn} ${payments[a.name] !== 'owes' ? styles.payPaid : ''}`}
+                      onClick={() => setPayments({ ...payments, [a.name]: 'paid' })}
+                    >✓ Paid</button>
+                    <button
+                      className={`${styles.payBtn} ${payments[a.name] === 'owes' ? styles.payOwes : ''}`}
+                      onClick={() => setPayments({ ...payments, [a.name]: 'owes' })}
+                    >Owes</button>
+                  </div>
+                </div>
+              ))}
+              {anyPaid && (
                 <select
                   className={`${styles.select} ${styles.mt8}`}
                   value={method}
@@ -379,7 +408,18 @@ export default function ConfirmLesson() {
         {/* ── Total ─────────────────────────────────────────────────────── */}
         <div className={styles.totalRow}>
           <span>Total</span>
-          <span className={styles.totalAmt}>€{totalDue}</span>
+          {isPackage ? (
+            <span className={styles.totalAmt}>€{totalDue}</span>
+          ) : (
+            <input
+              type="number"
+              className={styles.totalInput}
+              value={totalDue}
+              onChange={e => setCustomTotal(Math.max(0, Number(e.target.value)))}
+              min={0}
+              step={1}
+            />
+          )}
           <span className={styles.muted}>
             {isFirstPackSession
               ? `${pkgSize} sessions (1 free) · €${packPrice}`

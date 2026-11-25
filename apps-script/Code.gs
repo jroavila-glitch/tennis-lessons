@@ -483,30 +483,35 @@ function writeSingleRow(sheet, c) {
   const hours             = c.durationMin / 60
   const numPeople         = c.people.length
   const isPackage         = c.payment === 'pack' || c.payment === 'packOwes' || !!c.isPackage
-  const isFirstPackSession = !!c.isFirstPackSession  // session 1 of a new pack
+  const isFirstPackSession = !!c.isFirstPackSession
   const paidInFull        = c.payment === 'paid' || c.payment === 'pack'
 
-  // K: session 1 = pack price (user-set, not packageSize × rate); session 2+ = 0; regular = per-session
-  const totalDue = isFirstPackSession
-    ? (c.packPrice != null ? c.packPrice : (c.packageSize - 1) * c.pricePerHour)
-    : isPackage
-      ? 0
-      : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
+  // K: use form-supplied totalDue when available, else compute
+  const totalDue = c.totalDue != null
+    ? c.totalDue
+    : isFirstPackSession
+      ? (c.packPrice != null ? c.packPrice : (c.packageSize - 1) * c.pricePerHour)
+      : isPackage
+        ? 0
+        : Math.round(c.pricePerHour * hours * numPeople * 100) / 100
 
-  const amtTx  = paidInFull ? totalDue : 0
-  const owes   = paidInFull ? 0 : totalDue
+  // N / L: use form-computed amtTx / amtOwes when available (handles per-person splits)
+  const amtTx  = c.amtTx  != null ? c.amtTx  : (paidInFull ? totalDue : 0)
+  const owes   = c.amtOwes != null ? c.amtOwes : (paidInFull ? 0 : totalDue)
   const ctYou  = c.courtFeeYou || 0
   const profit = amtTx - ctYou
   const type   = c.type || (numPeople > 1 ? 'Group' : 'Individual')
 
-  // M: pack paid status (Y/N) — only for pack rows
-  let packPaid = ''
+  // M: Y/N for all rows — pack rows inherit from session 1; regular rows use payment state
+  let packPaid
   if (isPackage) {
     if (isFirstPackSession) {
       packPaid = paidInFull ? 'Y' : 'N'
     } else {
       packPaid = getPackFirstSessionPaid(sheet, c.people[0], c.packageSize || 10)
     }
+  } else {
+    packPaid = amtTx >= totalDue ? 'Y' : 'N'
   }
 
   sheet.appendRow([

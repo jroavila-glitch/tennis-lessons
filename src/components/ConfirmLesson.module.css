@@ -257,7 +257,34 @@
   color: var(--accent);
 }
 
+/* ── Per-person payment ── */
+.personPayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.personName {
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 80px;
+}
+
 /* ── Total ── */
+.totalInput {
+  width: 80px;
+  padding: 4px 8px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  text-align: center;
+}
+
 .totalRow {
   display: flex;
   align-items: baseline;
