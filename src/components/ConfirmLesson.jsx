@@ -36,11 +36,16 @@ export default function ConfirmLesson() {
   const params = new URLSearchParams(window.location.search)
 
   useEffect(() => {
-    const encoded = params.get('d')
-    if (!encoded) { setErrMsg('No lesson data in URL'); setStatus('error'); return }
+    const lessonId = params.get('id')
+    const encoded  = params.get('d')
 
-    try {
-      const data = JSON.parse(atob(encoded))
+    if (!lessonId && !encoded) {
+      setErrMsg('No lesson data in URL')
+      setStatus('error')
+      return
+    }
+
+    const applyData = data => {
       setLesson(data)
 
       const people = data.people || []
@@ -54,12 +59,10 @@ export default function ConfirmLesson() {
       }
 
       const p0 = definite[0]
-      // Always read pack info from student data — session/size are always computed server-side
       if (definite.length > 0 && p0) {
-        if (p0.packageSize)               setPkgSize(p0.packageSize)
-        if (p0.nextSession)               setPkgSession(p0.nextSession)
-        if (p0.lastSession !== undefined)  setLastSession(p0.lastSession)
-        // Pack price = (size - 1) × rate (1 free session) — always pre-fill
+        if (p0.packageSize)                setPkgSize(p0.packageSize)
+        if (p0.nextSession)                setPkgSession(p0.nextSession)
+        if (p0.lastSession !== undefined)   setLastSession(p0.lastSession)
         if (p0.packageSize && p0.lastPrice) setPackPrice((p0.packageSize - 1) * p0.lastPrice)
       }
 
@@ -70,9 +73,23 @@ export default function ConfirmLesson() {
 
       setLessonType(definite.length > 1 ? 'Group' : 'Individual')
       setStatus('ready')
-    } catch (e) {
-      setErrMsg('Could not decode lesson data: ' + e.message)
-      setStatus('error')
+    }
+
+    if (lessonId) {
+      fetch(`/api/get-lesson?id=${encodeURIComponent(lessonId)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) throw new Error(data.error)
+          applyData(data)
+        })
+        .catch(e => { setErrMsg(e.message); setStatus('error') })
+    } else {
+      try {
+        applyData(JSON.parse(atob(encoded)))
+      } catch (e) {
+        setErrMsg('Could not decode lesson data: ' + e.message)
+        setStatus('error')
+      }
     }
   }, [])
 

@@ -289,10 +289,11 @@ function processEvent(eventId) {
     }
   })
 
-  // Encode lesson data directly in the URL — no PropertiesService needed for GET
+  // Store lesson data server-side; put only a short ID in the WhatsApp URL
   const urlData  = { ...parsed, people: peopleInfo }
-  const encoded  = encodeURIComponent(Utilities.base64Encode(JSON.stringify(urlData)))
-  const confirmUrl = `${baseUrl}/confirm?d=${encoded}`
+  const lessonId = Utilities.getUuid().replace(/-/g, '').substring(0, 10)
+  storePendingLesson(lessonId, urlData)
+  const confirmUrl = `${baseUrl}/confirm?id=${lessonId}`
 
   // Build a readable WhatsApp message
   const confirmedPeople = peopleInfo.filter(p => !p.isMaybe)
