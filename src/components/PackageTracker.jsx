@@ -1,23 +1,16 @@
 import styles from './PackageTracker.module.css'
 
-function splitIntoPackages(sessions) {
-  // Trust the sheet row order (chronological as entered).
-  // Only start a new package when the previous one is fully complete —
-  // this avoids phantom splits caused by sessions with no dates or minor data issues.
+export function splitIntoPackages(sessions) {
+  if (!sessions.length) return []
   const packages = []
-  let current = []
-  for (const s of sessions) {
-    if (s.packageSession === 1 && current.length > 0) {
-      const prevSize      = Math.max(...current.map(x => x.packageSize || 10))
-      const prevCompleted = Math.max(...current.map(x => x.packageSession))
-      if (prevCompleted >= prevSize) {
-        // Previous pack is done — this really is a new package
-        packages.push(current)
-        current = [s]
-      } else {
-        // Previous pack isn't done — this is likely a numbering quirk, keep going
-        current.push(s)
-      }
+  let current = [sessions[0]]
+  for (let i = 1; i < sessions.length; i++) {
+    const s    = sessions[i]
+    const prev = sessions[i - 1]
+    // New pack when session counter resets (goes lower than previous)
+    if (s.packageSession < prev.packageSession) {
+      packages.push(current)
+      current = [s]
     } else {
       current.push(s)
     }

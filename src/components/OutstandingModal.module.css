@@ -92,6 +92,23 @@
   color: var(--accent-red);
 }
 
+/* ── Pack block ── */
+.packBlock {
+  border-top: 1px solid var(--border);
+}
+
+.packLabel {
+  padding: 8px 24px 6px 36px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Debt row highlighted */
+.debtRow {
+  background: rgba(var(--accent-red-rgb, 220,53,69), 0.04);
+}
+
 /* ── Session row ── */
 .sessionRow {
   display: flex;
