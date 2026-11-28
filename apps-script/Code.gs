@@ -197,10 +197,21 @@ function getKnownStudents(sheet) {
   return [...names].sort()
 }
 
-// Fuzzy match a parsed name against known students (case-insensitive)
+// Match a parsed name against known students — exact first, then prefix/nickname
 function matchStudent(parsed, knownStudents) {
   const lc = parsed.toLowerCase().trim()
-  return knownStudents.find(s => s.toLowerCase().trim() === lc) || parsed
+  // 1. Exact match
+  const exact = knownStudents.find(s => s.toLowerCase().trim() === lc)
+  if (exact) return exact
+  // 2. Nickname/abbreviation: one name is a prefix of the other (min 4 chars)
+  if (lc.length >= 4) {
+    const fuzzy = knownStudents.find(s => {
+      const slc = s.toLowerCase().trim()
+      return slc.startsWith(lc) || lc.startsWith(slc)
+    })
+    if (fuzzy) return fuzzy
+  }
+  return parsed
 }
 
 // ── Callmebot WhatsApp ────────────────────────────────────────────────────
